@@ -1,8 +1,12 @@
 package twittertest.bassem.com.twittertest.fragments;
 
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.os.ResultReceiver;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,12 +14,17 @@ import android.widget.Button;
 
 import twittertest.bassem.com.twittertest.ActivityMain;
 import twittertest.bassem.com.twittertest.R;
+import twittertest.bassem.com.twittertest.Services.UserFollowersService;
+import twittertest.bassem.com.twittertest.helpers.Constants;
+import twittertest.bassem.com.twittertest.helpers.TwitterHelper;
+import twittertest.bassem.com.twittertest.receivers.GetUserFollowersReceiver;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class FragmentUserFollowers extends Fragment {
+public class FragmentUserFollowers extends Fragment implements GetUserFollowersReceiver.Receiver {
     Button openUserFollowersButton;
+    GetUserFollowersReceiver mReceiver = new GetUserFollowersReceiver(new Handler());
 
     public FragmentUserFollowers() {
         // Required empty public constructor
@@ -42,5 +51,25 @@ public class FragmentUserFollowers extends Fragment {
         }
     };
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        // set result rec
+        mReceiver.setReceiver(this);
+        getFollowers();
+    }
 
+    public void getFollowers() {
+        Intent intent = new Intent(Intent.ACTION_SYNC, null, getContext(), UserFollowersService.class);
+        intent.putExtra(Constants.USER_ID_EXTRA, TwitterHelper.GetCurrentUserId());
+        intent.putExtra(Constants.CURSOR_EXTRA, -1);
+        intent.putExtra(Constants.PAGESIZE_EXTRA, 10);
+        intent.putExtra(Constants.RECEIVER_EXTRA, mReceiver);
+        getContext().startService(intent);
+    }
+
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+
+    }
 }

@@ -12,6 +12,8 @@ import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.models.User;
 
+import java.io.IOException;
+
 import io.fabric.sdk.android.Fabric;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -50,7 +52,7 @@ public class TwitterHelper {
     public static void GetUser() {
         TwitterSession currentSession = Twitter.getSessionManager().getActiveSession();
         MyTwitterApiClient apiclients = new MyTwitterApiClient(currentSession);
-        TwitterUserProfileService statusesService=apiclients.getUserProfileService();
+        TwitterUserProfileService statusesService = apiclients.getUserProfileService();
         Call<User> call = statusesService.show(currentSession.getUserId());
         call.enqueue(new Callback<User>() {
             @Override
@@ -64,21 +66,27 @@ public class TwitterHelper {
         });
 
     }
-    public static void GetFollowers(){
-        TwitterSession currentSession=Twitter.getSessionManager().getActiveSession();
-        MyTwitterApiClient apiClient=new MyTwitterApiClient(currentSession);
-        TwitterUserFollowersService followersService=apiClient.getUserFollowersService();
-        Call<JsonElement> call=followersService.list(currentSession.getUserId(),false);
-        call.enqueue(new retrofit2.Callback<JsonElement>() {
-            @Override
-            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
 
-            }
+    public static Response<JsonElement> GetFollowers(long userId, int pageSize, int cursor) {
+        TwitterSession currentSession = Twitter.getSessionManager().getActiveSession();
+        MyTwitterApiClient apiClient = new MyTwitterApiClient(currentSession);
+        TwitterUserFollowersService followersService = apiClient.getUserFollowersService();
+        Call<JsonElement> call = followersService.list(userId, pageSize, cursor, false);
+        try {
+            return call.execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
 
-            @Override
-            public void onFailure(Call<JsonElement> call, Throwable t) {
+    }
 
-            }
-        });
+    public static long GetCurrentUserId() {
+        if (isTwitterInitialized) {
+            TwitterSession currentSession = Twitter.getSessionManager().getActiveSession();
+            if (currentSession != null)
+                return currentSession.getUserId();
+        }
+        return -1;
     }
 }
