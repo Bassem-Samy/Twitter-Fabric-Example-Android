@@ -8,7 +8,7 @@ import com.google.gson.JsonElement;
 import twittertest.bassem.com.twittertest.Models.GetUserFollowersResponse;
 
 /**
- * Created by Mina Samy on 10/21/2016.
+ * Created by Bassem Samy on 10/21/2016.
  */
 
 public class GsonHelper {

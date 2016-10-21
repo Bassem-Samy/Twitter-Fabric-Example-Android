@@ -4,24 +4,29 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
+import com.j256.ormlite.field.DatabaseField;
 
 /**
- * Created by Mina Samy on 10/21/2016.
+ * Created by Bassem Samy on 10/21/2016.
  */
 
 public class Follower implements Parcelable {
     @SerializedName("id_str")
+    @DatabaseField(id = true)
     private String id;
-
+    @DatabaseField
     @SerializedName("description")
     private String bio;
-
+    @DatabaseField
     @SerializedName("name")
     private String name;
+    @DatabaseField
     @SerializedName("screen_name")
     private String screenName;
+    @DatabaseField
     @SerializedName("profile_image_url")
     private String profileImageUrl;
+    @DatabaseField
     @SerializedName("profile_banner_url")
     private String bannerBackgroundUrl;
 
@@ -34,6 +39,9 @@ public class Follower implements Parcelable {
         bannerBackgroundUrl = in.readString();
     }
 
+    // for ORMLITE
+    public Follower() {
+    }
 
     public String getId() {
         return id;

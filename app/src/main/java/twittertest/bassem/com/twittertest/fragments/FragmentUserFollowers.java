@@ -24,6 +24,7 @@ import twittertest.bassem.com.twittertest.receivers.GetUserFollowersReceiver;
  * A simple {@link Fragment} subclass.
  */
 public class FragmentUserFollowers extends Fragment implements GetUserFollowersReceiver.Receiver {
+    private static final String RESPONSE_EXTRA = "response";
     Button openUserFollowersButton;
     GetUserFollowersReceiver mReceiver = new GetUserFollowersReceiver(new Handler());
     GetUserFollowersResponse userFollowersResponse;
@@ -40,6 +41,7 @@ public class FragmentUserFollowers extends Fragment implements GetUserFollowersR
         View view = inflater.inflate(R.layout.fragment_user_followers, container, false);
         openUserFollowersButton = (Button) view.findViewById(R.id.btn_openInfo);
         openUserFollowersButton.setOnClickListener(openUserFollowersFragment);
+
         return view;
     }
 
@@ -77,5 +79,10 @@ public class FragmentUserFollowers extends Fragment implements GetUserFollowersR
             userFollowersResponse = resultData.getParcelable(Constants.RESULT_EXTRA);
         }
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 }
