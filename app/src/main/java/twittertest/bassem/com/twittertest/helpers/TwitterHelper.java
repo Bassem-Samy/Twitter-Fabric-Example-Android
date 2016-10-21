@@ -2,6 +2,7 @@ package twittertest.bassem.com.twittertest.helpers;
 
 import android.content.Context;
 
+import com.google.gson.JsonElement;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
@@ -67,15 +68,15 @@ public class TwitterHelper {
         TwitterSession currentSession=Twitter.getSessionManager().getActiveSession();
         MyTwitterApiClient apiClient=new MyTwitterApiClient(currentSession);
         TwitterUserFollowersService followersService=apiClient.getUserFollowersService();
-        Call<Object> call=followersService.list(currentSession.getUserId());
-        call.enqueue(new retrofit2.Callback<Object>() {
+        Call<JsonElement> call=followersService.list(currentSession.getUserId(),false);
+        call.enqueue(new retrofit2.Callback<JsonElement>() {
             @Override
-            public void onResponse(Call<Object> call, Response<Object> response) {
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
 
             }
 
             @Override
-            public void onFailure(Call<Object> call, Throwable t) {
+            public void onFailure(Call<JsonElement> call, Throwable t) {
 
             }
         });

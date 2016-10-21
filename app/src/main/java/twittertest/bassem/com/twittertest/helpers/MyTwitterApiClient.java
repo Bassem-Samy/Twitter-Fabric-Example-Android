@@ -1,5 +1,6 @@
 package twittertest.bassem.com.twittertest.helpers;
 
+import com.google.gson.JsonElement;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterApiClient;
 import com.twitter.sdk.android.core.TwitterSession;
@@ -40,7 +41,7 @@ interface TwitterUserProfileService {
 
 interface TwitterUserFollowersService {
     @GET("/1.1/followers/list.json")
-    Call<Object> list(@Query("user_id") long id);
+    Call<JsonElement> list(@Query("user_id") long id,@Query("include_user_entities") boolean includeUserEntities);
 
 }
 

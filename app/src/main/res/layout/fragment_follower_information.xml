@@ -2,17 +2,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="twittertest.bassem.com.twittertest.fragments.FragmentUserFollowers">
+    tools:context="twittertest.bassem.com.twittertest.fragments.FragmentFollowerInformation">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Hello fragment user followers" />
-<Button
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:id="@+id/btn_openInfo"
-    android:text="open user info"/>
+        android:text="hello fragment follower information" />
+
 </FrameLayout>
