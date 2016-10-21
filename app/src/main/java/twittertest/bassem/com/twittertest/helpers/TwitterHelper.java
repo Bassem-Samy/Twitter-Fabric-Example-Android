@@ -67,7 +67,7 @@ public class TwitterHelper {
 
     }
 
-    public static Response<JsonElement> GetFollowers(long userId, int pageSize, int cursor) {
+    public static Response<JsonElement> GetFollowers(long userId, int pageSize, String cursor) {
         TwitterSession currentSession = Twitter.getSessionManager().getActiveSession();
         MyTwitterApiClient apiClient = new MyTwitterApiClient(currentSession);
         TwitterUserFollowersService followersService = apiClient.getUserFollowersService();

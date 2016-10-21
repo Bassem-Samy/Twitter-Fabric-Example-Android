@@ -13,4 +13,6 @@ public class Constants {
     public static final String PAGESIZE_EXTRA = "page_size";
     public static final String USER_ID_EXTRA = "user_id";
     public static final String RECEIVER_EXTRA="receiver";
+    public static final String CURRENTUSERSCOUNT_EXTRA="current_users_count";
+    public static final String RESULT_EXTRA = "result";
 }

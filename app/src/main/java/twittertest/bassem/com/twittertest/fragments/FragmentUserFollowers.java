@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import twittertest.bassem.com.twittertest.ActivityMain;
+import twittertest.bassem.com.twittertest.Models.GetUserFollowersResponse;
 import twittertest.bassem.com.twittertest.R;
 import twittertest.bassem.com.twittertest.Services.UserFollowersService;
 import twittertest.bassem.com.twittertest.helpers.Constants;
@@ -25,6 +26,7 @@ import twittertest.bassem.com.twittertest.receivers.GetUserFollowersReceiver;
 public class FragmentUserFollowers extends Fragment implements GetUserFollowersReceiver.Receiver {
     Button openUserFollowersButton;
     GetUserFollowersReceiver mReceiver = new GetUserFollowersReceiver(new Handler());
+    GetUserFollowersResponse userFollowersResponse;
 
     public FragmentUserFollowers() {
         // Required empty public constructor
@@ -62,14 +64,18 @@ public class FragmentUserFollowers extends Fragment implements GetUserFollowersR
     public void getFollowers() {
         Intent intent = new Intent(Intent.ACTION_SYNC, null, getContext(), UserFollowersService.class);
         intent.putExtra(Constants.USER_ID_EXTRA, TwitterHelper.GetCurrentUserId());
-        intent.putExtra(Constants.CURSOR_EXTRA, -1);
+        intent.putExtra(Constants.CURSOR_EXTRA, "1500097983506504661");//-1);
         intent.putExtra(Constants.PAGESIZE_EXTRA, 10);
         intent.putExtra(Constants.RECEIVER_EXTRA, mReceiver);
+        intent.putExtra(Constants.CURRENTUSERSCOUNT_EXTRA, 1);
         getContext().startService(intent);
     }
 
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
+        if (resultCode == 1) {
+            userFollowersResponse = resultData.getParcelable(Constants.RESULT_EXTRA);
+        }
 
     }
 }
