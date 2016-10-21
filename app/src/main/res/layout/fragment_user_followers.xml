@@ -5,14 +5,18 @@
     tools:context="twittertest.bassem.com.twittertest.fragments.FragmentUserFollowers">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+
+
+    <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swipeContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Hello fragment user followers" />
-<Button
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:id="@+id/btn_openInfo"
-    android:text="open user info"/>
+        >
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rclr_followers"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+           />
+    </android.support.v4.widget.SwipeRefreshLayout>
 </FrameLayout>
