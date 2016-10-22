@@ -44,12 +44,12 @@ public class UserFollowersAdapter extends RecyclerView.Adapter<UserFollowersAdap
         holder.nameTextView.setText(mDataset.get(position).getName());
         holder.handleTextView.setText(mDataset.get(position).getScreenName());
         holder.bioTextView.setText(mDataset.get(position).getBio());
-        if (mDataset.get(position).getProfileImageUrl() != null && mDataset.get(position).getProfileImageUrl().isEmpty() == false)
+        if (mDataset.get(position).getProfileImageUrl() != null && mDataset.get(position).getProfileImageUrl().isEmpty() == false) {
             Glide.with(mContext).load(mDataset.get(position).getFinalProfileImageUrl()).
                     diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.profileImageView);
-        else
+        } else {
             holder.profileImageView.setImageBitmap(null);
-
+        }
     }
 
     @Override
