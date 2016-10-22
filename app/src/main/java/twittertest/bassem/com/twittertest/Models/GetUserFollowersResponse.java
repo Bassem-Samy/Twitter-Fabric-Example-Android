@@ -21,7 +21,11 @@ public class GetUserFollowersResponse implements Parcelable {
     protected GetUserFollowersResponse(Parcel in) {
         next_cursor = in.readString();
         previous_cursor = in.readString();
+        followers = new ArrayList<>();
         in.readTypedList(followers, Follower.CREATOR);
+    }
+
+    public GetUserFollowersResponse() {
     }
 
     public ArrayList<Follower> getFollowers() {

@@ -13,6 +13,7 @@ import java.util.concurrent.Callable;
 
 import twittertest.bassem.com.twittertest.Models.Follower;
 import twittertest.bassem.com.twittertest.Models.GetUserFollowersResponse;
+import twittertest.bassem.com.twittertest.fragments.FragmentUserFollowers;
 import twittertest.bassem.com.twittertest.helpers.Constants;
 import twittertest.bassem.com.twittertest.helpers.DatabaseHelper;
 import twittertest.bassem.com.twittertest.helpers.GsonHelper;
@@ -38,34 +39,35 @@ public class UserFollowersService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
-            final ResultReceiver receiver = intent.getParcelableExtra(Constants.RECEIVER_EXTRA);
             userId = intent.getLongExtra(Constants.USER_ID_EXTRA, 0);
             cursor = intent.getStringExtra(Constants.CURSOR_EXTRA);
             pageSize = intent.getIntExtra(Constants.PAGESIZE_EXTRA, 0);
 
             Bundle bundle = new Bundle();
             try {
-                receiver.send(Constants.STATUS_RUNNING, Bundle.EMPTY);
                 retrofit2.Response<JsonElement> res = TwitterHelper.GetFollowers(userId, pageSize, cursor);
                 if (res.isSuccessful()) {
                     GetUserFollowersResponse response = GsonHelper.parseUserFollowersResponse(res.body(), this);
-                    updateDatabase(response, bundle, receiver);
+                    updateDatabase(response);
 
                 } else {
                     //Try parse error and put in bundle
-                    
-                    receiver.send(Constants.STATUS_ERROR, bundle);
+
+                    sendBroadcast(null);
 
                 }
+
             } catch (Exception ex) {
-                bundle.putString(Intent.EXTRA_TEXT, ex.toString());
-                receiver.send(Constants.STATUS_ERROR, bundle);
+                GetUserFollowersResponse res=new GetUserFollowersResponse();
+                sendBackBroadCast(res);
+
+
             }
-            this.stopSelf();
+           // this.stopSelf();
         }
     }
 
-    private void updateDatabase(final GetUserFollowersResponse response, final Bundle bundle, final ResultReceiver receiver) {
+    private void updateDatabase(final GetUserFollowersResponse response) {
         try {
             final Dao<Follower, Integer> followersDao = dbHelper.getFollowerDao();
             followersDao.callBatchTasks(new Callable<Void>() {
@@ -75,8 +77,7 @@ public class UserFollowersService extends IntentService {
                         for (Follower f : response.getFollowers())
                             followersDao.createOrUpdate(f);
                     }
-                    bundle.putParcelable(Constants.RESULT_EXTRA, response);
-                    receiver.send(Constants.STATUS_FINISHED, bundle);
+                    sendBackBroadCast(response);
                     return null;
                 }
             });
@@ -87,5 +88,14 @@ public class UserFollowersService extends IntentService {
         }
     }
 
+    private void sendBackBroadCast(GetUserFollowersResponse response) {
 
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction(FragmentUserFollowers.GetUserFollowersReceiver.PROCESS_RESPONSE);
+        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(Constants.RESULT_EXTRA, response);
+        broadcastIntent.putExtras(bundle);
+        sendBroadcast(broadcastIntent);
+    }
 }

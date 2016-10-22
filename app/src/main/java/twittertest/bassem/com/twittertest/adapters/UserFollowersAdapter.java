@@ -48,7 +48,7 @@ public class UserFollowersAdapter extends RecyclerView.Adapter<UserFollowersAdap
             Glide.with(mContext).load(mDataset.get(position).getFinalProfileImageUrl()).
                     diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.profileImageView);
         } else {
-            holder.profileImageView.setImageBitmap(null);
+            holder.profileImageView.setImageResource(android.R.color.transparent);
         }
     }
 
@@ -57,6 +57,14 @@ public class UserFollowersAdapter extends RecyclerView.Adapter<UserFollowersAdap
         if (mDataset != null)
             return mDataset.size();
         return 0;
+    }
+
+    public ArrayList<Follower> getDataset() {
+        return mDataset;
+    }
+
+    public void setmDataset(ArrayList<Follower> followers) {
+        mDataset = followers;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -73,4 +81,5 @@ public class UserFollowersAdapter extends RecyclerView.Adapter<UserFollowersAdap
             handleTextView = (TextView) itemView.findViewById(R.id.txt_follower_handle);
         }
     }
+
 }

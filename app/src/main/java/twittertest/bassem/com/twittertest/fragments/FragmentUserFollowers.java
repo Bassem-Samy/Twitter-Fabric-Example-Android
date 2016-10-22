@@ -1,7 +1,10 @@
 package twittertest.bassem.com.twittertest.fragments;
 
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -9,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,13 +29,14 @@ import twittertest.bassem.com.twittertest.Services.UserFollowersService;
 import twittertest.bassem.com.twittertest.adapters.UserFollowersAdapter;
 import twittertest.bassem.com.twittertest.helpers.Constants;
 import twittertest.bassem.com.twittertest.helpers.TwitterHelper;
-import twittertest.bassem.com.twittertest.receivers.GetUserFollowersReceiver;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class FragmentUserFollowers extends Fragment implements GetUserFollowersReceiver.Receiver {
-    ArrayList<Follower> mFollowers = new ArrayList<Follower>();
+public class FragmentUserFollowers extends Fragment {
+    private static final String SAVEDRESPONSE = "saved_response";
+    private static final String SAVEDFOLLOWERS = "saved_followers";
+    ArrayList<Follower> mFollowers;
     RecyclerView followersRecyclerView;
     LinearLayoutManager linearLayoutManager;
     SwipeRefreshLayout swipeContainer;
@@ -42,10 +47,11 @@ public class FragmentUserFollowers extends Fragment implements GetUserFollowersR
     int pastVisiblesItems;
     private static final String RESPONSE_EXTRA = "response";
     public boolean infiniteScrollingLoading = false;
-    GetUserFollowersReceiver mReceiver = new GetUserFollowersReceiver(new Handler());
+    GetUserFollowersReceiver mReceiver;
     GetUserFollowersResponse userFollowersResponse;
     UserFollowersAdapter mAdapter;
-    final static int PAGESIZE = 50;
+    final static int PAGESIZE = 45;
+    Intent followersIntent;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,27 +73,43 @@ public class FragmentUserFollowers extends Fragment implements GetUserFollowersR
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mReceiver.setReceiver(this);
-        linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        mFollowers = new ArrayList<Follower>();
+
+        mReceiver = new GetUserFollowersReceiver();
+        IntentFilter filter = new IntentFilter(GetUserFollowersReceiver.PROCESS_RESPONSE);
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        getContext().registerReceiver(mReceiver, filter);
+        Log.e("on created", "true");
+        if (linearLayoutManager == null)
+            linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         followersRecyclerView.setLayoutManager(linearLayoutManager);
         followersRecyclerView.addOnScrollListener(followersRecyclerViewOnScrollListener);
         mAdapter = new UserFollowersAdapter(mFollowers, getContext());
         followersRecyclerView.setAdapter(mAdapter);
-        mainProgressBar.setVisibility(View.VISIBLE);
-        getFollowers();
+        if (savedInstanceState == null) {
+            mainProgressBar.setVisibility(View.VISIBLE);
+            //    getFollowers();
+        } else {
+            //  scrollingProgressBar.setVisibility(View.VISIBLE);
+            retainState(savedInstanceState);
+
+        }
     }
 
+
     public void getFollowers() {
-        Intent intent = new Intent(Intent.ACTION_SYNC, null, getContext(), UserFollowersService.class);
-        intent.putExtra(Constants.RECEIVER_EXTRA, mReceiver);
-        intent.putExtra(Constants.USER_ID_EXTRA, TwitterHelper.GetCurrentUserId());
-        intent.putExtra(Constants.PAGESIZE_EXTRA, PAGESIZE);
-        intent.putExtra(Constants.CURRENTUSERSCOUNT_EXTRA, mFollowers.size());
+        if (mFollowers == null)
+            mFollowers = new ArrayList<Follower>();
+
+        followersIntent = new Intent(Intent.ACTION_SYNC, null, getActivity(), UserFollowersService.class);
+        followersIntent.putExtra(Constants.USER_ID_EXTRA, TwitterHelper.GetCurrentUserId());
+        followersIntent.putExtra(Constants.PAGESIZE_EXTRA, PAGESIZE);
+        followersIntent.putExtra(Constants.CURRENTUSERSCOUNT_EXTRA, mFollowers.size());
         if (userFollowersResponse != null)
-            intent.putExtra(Constants.CURSOR_EXTRA, userFollowersResponse.getNext_cursor());
+            followersIntent.putExtra(Constants.CURSOR_EXTRA, userFollowersResponse.getNext_cursor());
         else
-            intent.putExtra(Constants.CURSOR_EXTRA, "-1");
-        getContext().startService(intent);
+            followersIntent.putExtra(Constants.CURSOR_EXTRA, "-1");
+        getContext().startService(followersIntent);
     }
 
     private SwipeRefreshLayout.OnRefreshListener swipeContainerOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
@@ -124,37 +146,137 @@ public class FragmentUserFollowers extends Fragment implements GetUserFollowersR
 
     };
 
-    @Override
-    public void onReceiveResult(int resultCode, Bundle resultData) {
-        if (resultCode == Constants.STATUS_FINISHED) {
-            if (mainProgressBar.getVisibility() == View.VISIBLE)
-                mainProgressBar.setVisibility(View.GONE);
-            userFollowersResponse = resultData.getParcelable(Constants.RESULT_EXTRA);
-            if (userFollowersResponse != null && userFollowersResponse.getFollowers() != null) {
-                for (int i = 0; i < userFollowersResponse.getFollowers().size(); i++)
-                {
-                    //replace if exists
-                    mFollowers.add(userFollowersResponse.getFollowers().get(i));
-                }
-            }
-            mAdapter.notifyDataSetChanged();
-            infiniteScrollingLoading = false;
-            scrollingProgressBar.setVisibility(View.GONE);
-        } else {
-            if (resultCode == Constants.STATUS_ERROR) {
-                String errorMsg = resultData.getString(Constants.ERROR_MSG);
-                if (errorMsg != null)
-                    Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
-                else
-                    Toast.makeText(getContext(), R.string.error_msg, Toast.LENGTH_SHORT).show();
-                scrollingProgressBar.setVisibility(View.GONE);
-                mainProgressBar.setVisibility(View.GONE);
-            }
-        }
-    }
+//    @Override
+//    public void onReceiveResult(int resultCode, Bundle resultData) {
+//        if (resultCode == Constants.STATUS_FINISHED) {
+//            Log.e("onReceiveResult", "true");
+//            if (mainProgressBar.getVisibility() == View.VISIBLE)
+//                mainProgressBar.setVisibility(View.GONE);
+//            userFollowersResponse = resultData.getParcelable(Constants.RESULT_EXTRA);
+//            if (userFollowersResponse != null && userFollowersResponse.getFollowers() != null) {
+//                for (int i = 0; i < userFollowersResponse.getFollowers().size(); i++) {
+//                    //replace if exists
+//                    mFollowers.add(userFollowersResponse.getFollowers().get(i));
+//                }
+//            }
+//if(getActivity()!=null)
+//            getActivity().runOnUiThread(new Runnable() {
+//                public void run() {
+//                    Log.d("UI thread", "I am the UI thread");
+//
+//                    mAdapter.notifyDataSetChanged();
+//
+//                }
+//            });
+//            infiniteScrollingLoading = false;
+//            scrollingProgressBar.setVisibility(View.GONE);
+//        } else {
+//            if (resultCode == Constants.STATUS_ERROR) {
+//                String errorMsg = resultData.getString(Constants.ERROR_MSG);
+//                if (errorMsg != null)
+//                    Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
+//                else
+//                    Toast.makeText(getContext(), R.string.error_msg, Toast.LENGTH_SHORT).show();
+//                scrollingProgressBar.setVisibility(View.GONE);
+//                mainProgressBar.setVisibility(View.GONE);
+//            }
+//        }
+//    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        if (userFollowersResponse != null)
+            outState.putParcelable(SAVEDRESPONSE, userFollowersResponse);
+        if (mFollowers != null)
+            if (mFollowers.size() > 0)
+                outState.putParcelableArrayList(SAVEDFOLLOWERS, mFollowers);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mReceiver != null)
+            getContext().unregisterReceiver(mReceiver);
+        super.onDestroy();
+    }
+
+    @Override
+    public void onResume() {
+        // UserFollowersService.shouldContinue = true;
+
+        super.onResume();
+
+        if (mFollowers == null) {
+            mainProgressBar.setVisibility(View.VISIBLE);
+            getFollowers();
+        } else {
+            if (mFollowers.size() == 0) {
+                mainProgressBar.setVisibility(View.VISIBLE);
+                getFollowers();
+            }
+        }
+    }
+
+    private void retainState(Bundle savedInstanceState) {
+        if (userFollowersResponse == null) {
+            userFollowersResponse = savedInstanceState.getParcelable(SAVEDRESPONSE);
+        }
+        if (mFollowers != null) {
+            if (mFollowers.size() == 0) {
+                mFollowers = savedInstanceState.getParcelableArrayList(SAVEDFOLLOWERS);
+            }
+        }
+        if (mAdapter != null) {
+            if (mAdapter.getDataset().size() == 0) {
+                mAdapter.setmDataset(mFollowers);
+                mAdapter.notifyDataSetChanged();
+
+
+            }
+        }
+    }
+
+    public class GetUserFollowersReceiver extends BroadcastReceiver {
+
+        public static final String PROCESS_RESPONSE = "twittertest.bassem.com.twittertest.intent.action.PROCESS_RESPONSE";
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            GetUserFollowersResponse res = (GetUserFollowersResponse) intent.getExtras().getParcelable(Constants.RESULT_EXTRA);
+            if (res.getFollowers().size() > 0) {
+                userFollowersResponse = (GetUserFollowersResponse) res;
+                updateLayout();
+            } else {
+                Toast.makeText(getContext(), R.string.error_msg, Toast.LENGTH_SHORT).show();
+                scrollingProgressBar.setVisibility(View.GONE);
+                mainProgressBar.setVisibility(View.GONE);
+                infiniteScrollingLoading = false;
+
+            }
+        }
+    }
+
+    void updateLayout() {
+        if (userFollowersResponse != null && userFollowersResponse.getFollowers() != null) {
+            for (int i = 0; i < userFollowersResponse.getFollowers().size(); i++) {
+                //replace if exists
+                mFollowers.add(userFollowersResponse.getFollowers().get(i));
+            }
+            mAdapter=new UserFollowersAdapter(mFollowers,getContext());
+            followersRecyclerView.setAdapter(mAdapter);
+            mAdapter.notifyDataSetChanged();
+            if(pastVisiblesItems!=0)
+            linearLayoutManager.scrollToPosition(pastVisiblesItems+1);
+            // followersRecyclerView.setVisibility(View.VISIBLE);
+            mainProgressBar.setVisibility(View.GONE);
+            infiniteScrollingLoading = false;
+            scrollingProgressBar.setVisibility(View.GONE);
+        }
     }
 }
