@@ -9,6 +9,8 @@ import android.util.Log;
 import com.google.gson.JsonElement;
 import com.j256.ormlite.dao.Dao;
 
+import java.util.concurrent.Callable;
+
 import twittertest.bassem.com.twittertest.Models.Follower;
 import twittertest.bassem.com.twittertest.Models.GetUserFollowersResponse;
 import twittertest.bassem.com.twittertest.helpers.Constants;
@@ -21,9 +23,7 @@ import twittertest.bassem.com.twittertest.helpers.TwitterHelper;
  */
 
 public class UserFollowersService extends IntentService {
-    public static final int STATUS_RUNNING = 0;
-    public static final int STATUS_FINISHED = 1;
-    public static final int STATUS_ERROR = 2;
+
     private static final String TAG = "UserFollowersService";
     private long userId;
     private String cursor;
@@ -45,33 +45,47 @@ public class UserFollowersService extends IntentService {
 
             Bundle bundle = new Bundle();
             try {
-                receiver.send(STATUS_RUNNING, Bundle.EMPTY);
+                receiver.send(Constants.STATUS_RUNNING, Bundle.EMPTY);
                 retrofit2.Response<JsonElement> res = TwitterHelper.GetFollowers(userId, pageSize, cursor);
-                GetUserFollowersResponse response = GsonHelper.parseUserFollowersResponse(res.body(), this);
-                // GetUserFollowersResponse res;
-                // put result in bundle
-                updateDatabase(response);
-                bundle.putParcelable(Constants.RESULT_EXTRA, response);
-                receiver.send(STATUS_FINISHED, bundle);
+                if (res.isSuccessful()) {
+                    GetUserFollowersResponse response = GsonHelper.parseUserFollowersResponse(res.body(), this);
+                    updateDatabase(response, bundle, receiver);
 
+                } else {
+                    //Try parse error and put in bundle
+                    
+                    receiver.send(Constants.STATUS_ERROR, bundle);
+
+                }
             } catch (Exception ex) {
                 bundle.putString(Intent.EXTRA_TEXT, ex.toString());
-                receiver.send(STATUS_ERROR, bundle);
+                receiver.send(Constants.STATUS_ERROR, bundle);
             }
             this.stopSelf();
         }
     }
 
-    private void updateDatabase(GetUserFollowersResponse response) {
+    private void updateDatabase(final GetUserFollowersResponse response, final Bundle bundle, final ResultReceiver receiver) {
         try {
-            Dao<Follower, Integer> followersDao = dbHelper.getFollowerDao();
-            if (response != null && response.getFollowers() != null)
-                for (Follower f : response.getFollowers())
-                    followersDao.createOrUpdate(f);
+            final Dao<Follower, Integer> followersDao = dbHelper.getFollowerDao();
+            followersDao.callBatchTasks(new Callable<Void>() {
+                @Override
+                public Void call() throws Exception {
+                    if (response != null && response.getFollowers() != null) {
+                        for (Follower f : response.getFollowers())
+                            followersDao.createOrUpdate(f);
+                    }
+                    bundle.putParcelable(Constants.RESULT_EXTRA, response);
+                    receiver.send(Constants.STATUS_FINISHED, bundle);
+                    return null;
+                }
+            });
 
 
         } catch (Exception ex) {
             Log.e("save followers", ex.toString());
         }
     }
+
+
 }

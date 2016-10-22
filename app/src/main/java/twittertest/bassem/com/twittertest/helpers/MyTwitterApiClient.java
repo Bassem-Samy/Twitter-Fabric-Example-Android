@@ -41,7 +41,7 @@ interface TwitterUserProfileService {
 
 interface TwitterUserFollowersService {
     @GET("/1.1/followers/list.json")
-    Call<JsonElement> list(@Query("user_id") long id, @Query("count") int pageSize, @Query("cursor") String cursor, @Query("include_user_entities") boolean includeUserEntities);
+    Call<JsonElement> list(@Query("user_id") long id, @Query("count") int pageSize, @Query("cursor") String cursor, @Query("include_user_entities") boolean includeUserEntities,@Query("skip_status") boolean skipStatuses);
 
 }
 

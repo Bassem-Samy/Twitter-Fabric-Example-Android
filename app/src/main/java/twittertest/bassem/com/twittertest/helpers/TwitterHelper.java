@@ -71,10 +71,10 @@ public class TwitterHelper {
         TwitterSession currentSession = Twitter.getSessionManager().getActiveSession();
         MyTwitterApiClient apiClient = new MyTwitterApiClient(currentSession);
         TwitterUserFollowersService followersService = apiClient.getUserFollowersService();
-        Call<JsonElement> call = followersService.list(userId, pageSize, cursor, false);
+        Call<JsonElement> call = followersService.list(userId, pageSize, cursor, false,false);
         try {
             return call.execute();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
