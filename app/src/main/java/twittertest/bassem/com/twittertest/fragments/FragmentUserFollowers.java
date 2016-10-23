@@ -19,6 +19,9 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.j256.ormlite.table.TableUtils;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import twittertest.bassem.com.twittertest.ActivityMain;
@@ -28,6 +31,7 @@ import twittertest.bassem.com.twittertest.R;
 import twittertest.bassem.com.twittertest.Services.UserFollowersService;
 import twittertest.bassem.com.twittertest.adapters.UserFollowersAdapter;
 import twittertest.bassem.com.twittertest.helpers.Constants;
+import twittertest.bassem.com.twittertest.helpers.DatabaseHelper;
 import twittertest.bassem.com.twittertest.helpers.MyUtilities;
 import twittertest.bassem.com.twittertest.helpers.TwitterHelper;
 
@@ -76,7 +80,7 @@ public class FragmentUserFollowers extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mFollowers = new ArrayList<Follower>();
         if (MyUtilities.checkForInternet(getContext()) == false)
-            Toast.makeText(getContext(), R.string.no_internet_connection_getting_offlineData, Toast.LENGTH_SHORT).show();
+            showOfflineToast();
         mReceiver = new GetUserFollowersReceiver();
         IntentFilter filter = new IntentFilter(GetUserFollowersReceiver.PROCESS_RESPONSE);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
@@ -118,9 +122,27 @@ public class FragmentUserFollowers extends Fragment {
     private SwipeRefreshLayout.OnRefreshListener swipeContainerOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
         public void onRefresh() {
-            swipeContainer.setRefreshing(false);
+            if (MyUtilities.checkForInternet(getContext()) == false) {
+                showOfflineToast();
+                swipeContainer.setRefreshing(false);
+            } else {
+             prepareRefreshFollowers();
+            }
         }
     };
+
+    private void prepareRefreshFollowers() {
+        userFollowersResponse=null;
+        mFollowers.clear();
+        mAdapter.notifyDataSetChanged();
+        DatabaseHelper dbHelper=new DatabaseHelper(getContext());
+        try {
+            dbHelper.clearFollowerTable();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        getFollowers();
+    }
 
     RecyclerView.OnScrollListener followersRecyclerViewOnScrollListener = new RecyclerView.OnScrollListener() {
         @Override
@@ -250,6 +272,7 @@ public class FragmentUserFollowers extends Fragment {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            swipeContainer.setRefreshing(false);
 
             GetUserFollowersResponse res = (GetUserFollowersResponse) intent.getExtras().getParcelable(Constants.RESULT_EXTRA);
             if (res.getFollowers().size() > 0) {
@@ -281,5 +304,10 @@ public class FragmentUserFollowers extends Fragment {
             infiniteScrollingLoading = false;
             scrollingProgressBar.setVisibility(View.GONE);
         }
+    }
+
+    private void showOfflineToast() {
+        Toast.makeText(getContext(), R.string.no_internet_connection_getting_offlineData, Toast.LENGTH_SHORT).show();
+
     }
 }

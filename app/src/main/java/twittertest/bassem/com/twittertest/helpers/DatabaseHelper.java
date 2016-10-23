@@ -18,8 +18,8 @@ import twittertest.bassem.com.twittertest.Models.Follower;
 
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
-    private static final String DATABASE_NAME    = "twitterormlite.db";
-    private static final int    DATABASE_VERSION = 2;
+    private static final String DATABASE_NAME = "twitterormlite.db";
+    private static final int DATABASE_VERSION = 2;
 
     private Dao<Follower, Integer> mFollowerDao = null;
 
@@ -55,6 +55,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
 
         return mFollowerDao;
+    }
+
+    public void clearFollowerTable() throws SQLException {
+        TableUtils.clearTable(connectionSource, Follower.class);
     }
 
     @Override
