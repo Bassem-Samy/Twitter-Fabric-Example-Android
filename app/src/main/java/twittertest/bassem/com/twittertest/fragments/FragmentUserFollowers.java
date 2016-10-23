@@ -28,6 +28,7 @@ import twittertest.bassem.com.twittertest.R;
 import twittertest.bassem.com.twittertest.Services.UserFollowersService;
 import twittertest.bassem.com.twittertest.adapters.UserFollowersAdapter;
 import twittertest.bassem.com.twittertest.helpers.Constants;
+import twittertest.bassem.com.twittertest.helpers.MyUtilities;
 import twittertest.bassem.com.twittertest.helpers.TwitterHelper;
 
 /**
@@ -74,7 +75,8 @@ public class FragmentUserFollowers extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mFollowers = new ArrayList<Follower>();
-
+        if (MyUtilities.checkForInternet(getContext()) == false)
+            Toast.makeText(getContext(), R.string.no_internet_connection_getting_offlineData, Toast.LENGTH_SHORT).show();
         mReceiver = new GetUserFollowersReceiver();
         IntentFilter filter = new IntentFilter(GetUserFollowersReceiver.PROCESS_RESPONSE);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
@@ -98,6 +100,7 @@ public class FragmentUserFollowers extends Fragment {
 
 
     public void getFollowers() {
+
         if (mFollowers == null)
             mFollowers = new ArrayList<Follower>();
 
@@ -268,11 +271,11 @@ public class FragmentUserFollowers extends Fragment {
                 //replace if exists
                 mFollowers.add(userFollowersResponse.getFollowers().get(i));
             }
-            mAdapter=new UserFollowersAdapter(mFollowers,getContext());
+            mAdapter = new UserFollowersAdapter(mFollowers, getContext());
             followersRecyclerView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
-            if(pastVisiblesItems!=0)
-            linearLayoutManager.scrollToPosition(pastVisiblesItems+1);
+            if (pastVisiblesItems != 0)
+                linearLayoutManager.scrollToPosition(pastVisiblesItems + 1);
             // followersRecyclerView.setVisibility(View.VISIBLE);
             mainProgressBar.setVisibility(View.GONE);
             infiniteScrollingLoading = false;

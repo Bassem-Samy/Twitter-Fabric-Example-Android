@@ -8,7 +8,9 @@ import android.util.Log;
 
 import com.google.gson.JsonElement;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.QueryBuilder;
 
+import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
 import twittertest.bassem.com.twittertest.Models.Follower;
@@ -17,6 +19,7 @@ import twittertest.bassem.com.twittertest.fragments.FragmentUserFollowers;
 import twittertest.bassem.com.twittertest.helpers.Constants;
 import twittertest.bassem.com.twittertest.helpers.DatabaseHelper;
 import twittertest.bassem.com.twittertest.helpers.GsonHelper;
+import twittertest.bassem.com.twittertest.helpers.MyUtilities;
 import twittertest.bassem.com.twittertest.helpers.TwitterHelper;
 
 /**
@@ -29,6 +32,7 @@ public class UserFollowersService extends IntentService {
     private long userId;
     private String cursor;
     private int pageSize;
+    private int totalItemsSize;
     private DatabaseHelper dbHelper;
 
     public UserFollowersService() {
@@ -42,29 +46,51 @@ public class UserFollowersService extends IntentService {
             userId = intent.getLongExtra(Constants.USER_ID_EXTRA, 0);
             cursor = intent.getStringExtra(Constants.CURSOR_EXTRA);
             pageSize = intent.getIntExtra(Constants.PAGESIZE_EXTRA, 0);
-
+            totalItemsSize = intent.getIntExtra(Constants.CURRENTUSERSCOUNT_EXTRA, 0);
             Bundle bundle = new Bundle();
             try {
-                retrofit2.Response<JsonElement> res = TwitterHelper.GetFollowers(userId, pageSize, cursor);
-                if (res.isSuccessful()) {
-                    GetUserFollowersResponse response = GsonHelper.parseUserFollowersResponse(res.body(), this);
-                    updateDatabase(response);
+                if (MyUtilities.checkForInternet(this)) {
+                    retrofit2.Response<JsonElement> res = TwitterHelper.GetFollowers(userId, pageSize, cursor);
+                    if (res.isSuccessful()) {
+                        GetUserFollowersResponse response = GsonHelper.parseUserFollowersResponse(res.body(), this);
+                        updateDatabase(response);
 
+                    } else {
+                        //Try parse error and put in bundle
+
+                        sendBroadcast(null);
+
+                    }
                 } else {
-                    //Try parse error and put in bundle
-
-                    sendBroadcast(null);
-
+                    loadOffline();
                 }
-
             } catch (Exception ex) {
-                GetUserFollowersResponse res=new GetUserFollowersResponse();
+                GetUserFollowersResponse res = new GetUserFollowersResponse();
                 sendBackBroadCast(res);
 
 
             }
-           // this.stopSelf();
+            // this.stopSelf();
         }
+    }
+
+    private void loadOffline() {
+        GetUserFollowersResponse response = new GetUserFollowersResponse();
+
+        try {
+            final Dao<Follower, Integer> followersDao = dbHelper.getFollowerDao();
+            int totalNumber = (int) followersDao.countOf();
+            QueryBuilder<Follower, Integer> builder = followersDao.queryBuilder();
+            builder.offset((long) totalItemsSize).limit((long) pageSize);
+            response.setFollowers((ArrayList<Follower>) followersDao.query(builder.prepare()));
+            if (response.getFollowers().size() + totalItemsSize == totalNumber)
+                response.setNext_cursor("0");
+            else
+                response.setNext_cursor("-1");
+        } catch (Exception ex) {
+        }
+        sendBackBroadCast(response);
+
     }
 
     private void updateDatabase(final GetUserFollowersResponse response) {
