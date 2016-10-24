@@ -31,6 +31,10 @@ public class MyTwitterApiClient extends TwitterApiClient {
     public TwitterUserFollowersService getUserFollowersService() {
         return getService(TwitterUserFollowersService.class);
     }
+
+    public TwitterUserTimeLine getUserTimelineService() {
+        return getService(TwitterUserTimeLine.class);
+    }
 }
 
 // example users/show service endpoint
@@ -41,7 +45,12 @@ interface TwitterUserProfileService {
 
 interface TwitterUserFollowersService {
     @GET("/1.1/followers/list.json")
-    Call<JsonElement> list(@Query("user_id") long id, @Query("count") int pageSize, @Query("cursor") String cursor, @Query("include_user_entities") boolean includeUserEntities,@Query("skip_status") boolean skipStatuses);
+    Call<JsonElement> list(@Query("user_id") long id, @Query("count") int pageSize, @Query("cursor") String cursor, @Query("include_user_entities") boolean includeUserEntities, @Query("skip_status") boolean skipStatuses);
 
+}
+
+interface TwitterUserTimeLine {
+    @GET("/1.1/statuses/user_timeline.json")
+    Call<JsonElement> list(@Query("user_id") long id, @Query("count") int pageSize);
 }
 

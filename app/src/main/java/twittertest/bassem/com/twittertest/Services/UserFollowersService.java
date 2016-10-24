@@ -58,7 +58,7 @@ public class UserFollowersService extends IntentService {
                     } else {
                         //Try parse error and put in bundle
 
-                        sendBroadcast(null);
+                        sendBackBroadCast(null);
 
                     }
                 } else {

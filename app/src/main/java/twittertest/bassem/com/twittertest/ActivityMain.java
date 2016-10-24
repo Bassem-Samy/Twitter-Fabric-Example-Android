@@ -11,6 +11,7 @@ import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 
 import io.fabric.sdk.android.Fabric;
+import twittertest.bassem.com.twittertest.Models.Follower;
 import twittertest.bassem.com.twittertest.fragments.FragmentFollowerInformation;
 import twittertest.bassem.com.twittertest.fragments.FragmentUserFollowers;
 import twittertest.bassem.com.twittertest.helpers.Constants;
@@ -36,15 +37,18 @@ public class ActivityMain extends AppCompatActivity {
 
     private void initializeFragments() {
         if (currentFragmentTag != null && currentFragmentTag.equalsIgnoreCase(Constants.FRAGMENT_FOLLOWERINFORMATION_TAG))
-            loadFollowerInformation();
+            loadFollowerInformation(null);
         else
             loadUserFollowersFragment();
 
     }
 
-    public void loadFollowerInformation() {
+    public void loadFollowerInformation(Follower follower) {
         if (getSupportFragmentManager().findFragmentByTag(Constants.FRAGMENT_FOLLOWERINFORMATION_TAG) == null) {
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(Constants.FOLLOWER_EXTRA, follower);
             FragmentFollowerInformation fragmentFollowerInformation = new FragmentFollowerInformation();
+            fragmentFollowerInformation.setArguments(bundle);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             currentFragmentTag = Constants.FRAGMENT_FOLLOWERINFORMATION_TAG;
             transaction.replace(R.id.frm_container, fragmentFollowerInformation, Constants.FRAGMENT_FOLLOWERINFORMATION_TAG).addToBackStack(null).commit();

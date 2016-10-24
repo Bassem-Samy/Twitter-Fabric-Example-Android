@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 import twittertest.bassem.com.twittertest.Models.Follower;
 import twittertest.bassem.com.twittertest.R;
+import twittertest.bassem.com.twittertest.fragments.FragmentUserFollowers;
 
 /**
  * Created by Bassem Samy on 10/21/2016.
@@ -25,15 +26,18 @@ import twittertest.bassem.com.twittertest.R;
 public class UserFollowersAdapter extends RecyclerView.Adapter<UserFollowersAdapter.ViewHolder> {
     private ArrayList<Follower> mDataset;
     private Context mContext;
+    private FragmentUserFollowers.onFollowersItemClickListener mOnItemClickListener;
 
-    public UserFollowersAdapter(ArrayList<Follower> dataset, Context context) {
+    public UserFollowersAdapter(ArrayList<Follower> dataset, Context context, FragmentUserFollowers.onFollowersItemClickListener onItemClickListener) {
         mContext = context;
         mDataset = dataset;
+        mOnItemClickListener = onItemClickListener;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_follower, parent, false);
+        v.setOnClickListener(mOnItemClickListener);
         return new ViewHolder(v);
     }
 
@@ -67,6 +71,10 @@ public class UserFollowersAdapter extends RecyclerView.Adapter<UserFollowersAdap
         mDataset = followers;
     }
 
+    public Follower getItemByPosition(int position) {
+        return mDataset.get(position);
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView profileImageView;
         TextView nameTextView;
@@ -81,5 +89,6 @@ public class UserFollowersAdapter extends RecyclerView.Adapter<UserFollowersAdap
             handleTextView = (TextView) itemView.findViewById(R.id.txt_follower_handle);
         }
     }
+
 
 }

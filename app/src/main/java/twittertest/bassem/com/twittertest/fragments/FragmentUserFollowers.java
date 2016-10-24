@@ -43,7 +43,6 @@ public class FragmentUserFollowers extends Fragment {
     private static final String SAVEDFOLLOWERS = "saved_followers";
     ArrayList<Follower> mFollowers;
     RecyclerView followersRecyclerView;
-    LinearLayoutManager linearLayoutManager;
     SwipeRefreshLayout swipeContainer;
     ProgressBar scrollingProgressBar;
     ProgressBar mainProgressBar;
@@ -54,9 +53,11 @@ public class FragmentUserFollowers extends Fragment {
     public boolean infiniteScrollingLoading = false;
     GetUserFollowersReceiver mReceiver;
     GetUserFollowersResponse userFollowersResponse;
+    LinearLayoutManager linearLayoutManager;
     UserFollowersAdapter mAdapter;
     final static int PAGESIZE = 45;
     Intent followersIntent;
+    private onFollowersItemClickListener onFollowersItemClickListener = new onFollowersItemClickListener();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,7 +79,8 @@ public class FragmentUserFollowers extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mFollowers = new ArrayList<Follower>();
+        if (mFollowers == null)
+            mFollowers = new ArrayList<Follower>();
         if (MyUtilities.checkForInternet(getContext()) == false)
             showOfflineToast();
         mReceiver = new GetUserFollowersReceiver();
@@ -86,17 +88,14 @@ public class FragmentUserFollowers extends Fragment {
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         getContext().registerReceiver(mReceiver, filter);
         Log.e("on created", "true");
-        if (linearLayoutManager == null)
-            linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
-        followersRecyclerView.setLayoutManager(linearLayoutManager);
+
+        followersRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        linearLayoutManager = (LinearLayoutManager) followersRecyclerView.getLayoutManager();
         followersRecyclerView.addOnScrollListener(followersRecyclerViewOnScrollListener);
-        mAdapter = new UserFollowersAdapter(mFollowers, getContext());
+        mAdapter = new UserFollowersAdapter(mFollowers, getContext(), onFollowersItemClickListener);
         followersRecyclerView.setAdapter(mAdapter);
-        if (savedInstanceState == null) {
-            mainProgressBar.setVisibility(View.VISIBLE);
-            //    getFollowers();
-        } else {
-            //  scrollingProgressBar.setVisibility(View.VISIBLE);
+        if (savedInstanceState != null) {
+
             retainState(savedInstanceState);
 
         }
@@ -114,8 +113,10 @@ public class FragmentUserFollowers extends Fragment {
         followersIntent.putExtra(Constants.CURRENTUSERSCOUNT_EXTRA, mFollowers.size());
         if (userFollowersResponse != null)
             followersIntent.putExtra(Constants.CURSOR_EXTRA, userFollowersResponse.getNext_cursor());
-        else
+        else {
+            mainProgressBar.setVisibility(View.VISIBLE);
             followersIntent.putExtra(Constants.CURSOR_EXTRA, "-1");
+        }
         getContext().startService(followersIntent);
     }
 
@@ -126,16 +127,16 @@ public class FragmentUserFollowers extends Fragment {
                 showOfflineToast();
                 swipeContainer.setRefreshing(false);
             } else {
-             prepareRefreshFollowers();
+                prepareRefreshFollowers();
             }
         }
     };
 
     private void prepareRefreshFollowers() {
-        userFollowersResponse=null;
+        userFollowersResponse = null;
         mFollowers.clear();
         mAdapter.notifyDataSetChanged();
-        DatabaseHelper dbHelper=new DatabaseHelper(getContext());
+        DatabaseHelper dbHelper = new DatabaseHelper(getContext());
         try {
             dbHelper.clearFollowerTable();
         } catch (SQLException e) {
@@ -294,7 +295,7 @@ public class FragmentUserFollowers extends Fragment {
                 //replace if exists
                 mFollowers.add(userFollowersResponse.getFollowers().get(i));
             }
-            mAdapter = new UserFollowersAdapter(mFollowers, getContext());
+            mAdapter = new UserFollowersAdapter(mFollowers, getContext(), onFollowersItemClickListener);
             followersRecyclerView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
             if (pastVisiblesItems != 0)
@@ -309,5 +310,21 @@ public class FragmentUserFollowers extends Fragment {
     private void showOfflineToast() {
         Toast.makeText(getContext(), R.string.no_internet_connection_getting_offlineData, Toast.LENGTH_SHORT).show();
 
+    }
+
+    public class onFollowersItemClickListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            Follower follower = mAdapter.getItemByPosition(followersRecyclerView.getChildLayoutPosition(v));
+            startUserInformation(follower);
+        }
+    }
+
+    private void startUserInformation(Follower follower) {
+        ActivityMain activityMain = (ActivityMain) getActivity();
+        if (activityMain != null) {
+            activityMain.loadFollowerInformation(follower);
+        }
     }
 }

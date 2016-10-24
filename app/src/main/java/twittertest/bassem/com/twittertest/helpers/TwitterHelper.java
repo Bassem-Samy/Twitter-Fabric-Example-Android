@@ -17,6 +17,7 @@ import java.io.IOException;
 import io.fabric.sdk.android.Fabric;
 import retrofit2.Call;
 import retrofit2.Response;
+import twittertest.bassem.com.twittertest.Services.UserTimelineService;
 
 /**
  * Created by Bassem Samy on 10/19/2016.
@@ -71,7 +72,7 @@ public class TwitterHelper {
         TwitterSession currentSession = Twitter.getSessionManager().getActiveSession();
         MyTwitterApiClient apiClient = new MyTwitterApiClient(currentSession);
         TwitterUserFollowersService followersService = apiClient.getUserFollowersService();
-        Call<JsonElement> call = followersService.list(userId, pageSize, cursor, false,false);
+        Call<JsonElement> call = followersService.list(userId, pageSize, cursor, false, false);
         try {
             return call.execute();
         } catch (Exception e) {
@@ -79,6 +80,19 @@ public class TwitterHelper {
             return null;
         }
 
+    }
+
+    public static Response<JsonElement> GetUserTimeline(long userId, int pageSize) {
+        TwitterSession currentSession = Twitter.getSessionManager().getActiveSession();
+        MyTwitterApiClient apiClient = new MyTwitterApiClient(currentSession);
+        TwitterUserTimeLine service = apiClient.getUserTimelineService();
+        Call<JsonElement> call = service.list(userId, pageSize);
+        try {
+            return call.execute();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
     }
 
     public static long GetCurrentUserId() {
