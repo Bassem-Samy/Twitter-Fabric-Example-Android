@@ -9,4 +9,5 @@
     <string name="no_internet_connection_please_connect_to_the_internet_and_try_again">
         No internet connection, please connect to the internet and try again
     </string>
+    <string name="sorry_there_are_no_tweets">Sorry there are no tweets!</string>
 </resources>

@@ -92,15 +92,19 @@ public class FragmentFollowerInformation extends Fragment {
     }
 
     private void populateTweets() {
-//        StikkyHeaderBuilder.stickTo(mScrollView)
-//                .setHeader(R.id.header, containerLinearLayout)
-//                .minHeightHeader(250)
-//                .animator(new IconAnimator())
-//                .build();
+        StikkyHeaderBuilder.stickTo(mScrollView)
+                .setHeader(R.id.header, containerLinearLayout)
+                .minHeightHeader(100)
+                .animator(new IconAnimator())
+                .build();
+        mScrollView.setPadding(0, 0, 0, 0);
         for (int i = 0; i < tweets.length; i++) {
             tweetsLinearLayout.addView(
                     new TweetView(getContext(), tweets[i])
             );
+        }
+        if (tweets.length == 0) {
+            Toast.makeText(getContext(), R.string.sorry_there_are_no_tweets, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -118,5 +122,12 @@ public class FragmentFollowerInformation extends Fragment {
         }
 
 
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mReceiver != null)
+            getContext().unregisterReceiver(mReceiver);
+        super.onDestroy();
     }
 }

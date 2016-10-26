@@ -16,11 +16,11 @@ public class IconAnimator  extends HeaderStikkyAnimator {
     @Override
     public AnimatorBuilder getAnimatorBuilder() {
 
-        View viewToAnimate = getHeader().findViewById(R.id.icon);
-        Point point = new Point(50,100); // translate to the point with coordinate (50,100);
-        float scaleX = 0.5f; //scale to the 50%
-        float scaleY = 0.5f; //scale to the 50%
-        float fade = 0.2f ;// 20% fade
+        View viewToAnimate = getHeader().findViewById(R.id.img_follower_bg);
+        Point point = new Point(0,0); // translate to the point with coordinate (50,100);
+        float scaleX = 1f; //scale to the 50%
+        float scaleY = 0.75f; //scale to the 50%
+        float fade = 1f ;// 20% fade
 
         AnimatorBuilder animatorBuilder = AnimatorBuilder.create()
                 .applyScale(viewToAnimate, scaleX, scaleY)
