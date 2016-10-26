@@ -52,7 +52,7 @@ public class UserFollowersService extends IntentService {
                 if (MyUtilities.checkForInternet(this)) {
                     retrofit2.Response<JsonElement> res = TwitterHelper.GetFollowers(userId, pageSize, cursor);
                     if (res.isSuccessful()) {
-                        GetUserFollowersResponse response = GsonHelper.parseUserFollowersResponse(res.body(), this);
+                        GetUserFollowersResponse response = GsonHelper.parseUserFollowersResponse(res.body());
                         updateDatabase(response);
 
                     } else {

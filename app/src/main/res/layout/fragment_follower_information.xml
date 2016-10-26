@@ -1,14 +1,23 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/lnr_user_tweets_fragment"
     tools:context="twittertest.bassem.com.twittertest.fragments.FragmentFollowerInformation">
+    <include layout="@layout/simple_header"/>
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/scrl_main">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="hello fragment follower information"
-        android:id="@+id/txt_title"/>
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/lnr_tweets"></LinearLayout>
 
-</FrameLayout>
+</ScrollView>
+
+
+</LinearLayout>

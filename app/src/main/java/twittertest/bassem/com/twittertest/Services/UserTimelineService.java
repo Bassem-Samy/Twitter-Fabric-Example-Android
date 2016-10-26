@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.gson.JsonElement;
+import com.twitter.sdk.android.core.models.Tweet;
 
 import twittertest.bassem.com.twittertest.Models.GetUserFollowersResponse;
 import twittertest.bassem.com.twittertest.fragments.FragmentFollowerInformation;
@@ -22,12 +23,7 @@ public class UserTimelineService extends IntentService {
     private long userId;
     private int pageSize;
 
-    /**
-     * Creates an IntentService.  Invoked by your subclass's constructor.
-     *
-     * @param name Used to name the worker thread, important only for debugging.
-     */
-    public UserTimelineService(String name) {
+    public UserTimelineService() {
         super(UserTimelineService.class.getName());
     }
 
@@ -40,7 +36,7 @@ public class UserTimelineService extends IntentService {
                 if (MyUtilities.checkForInternet(this)) {
                     retrofit2.Response<JsonElement> res = TwitterHelper.GetUserTimeline(userId, pageSize);
                     if (res.isSuccessful()) {
-                        Object response = GsonHelper.parseUserFollowersResponse(res.body(), this);
+                        sendBackBroadCast(res.body().toString());
                         //updateDatabase(response);
 
                     } else {
@@ -53,20 +49,19 @@ public class UserTimelineService extends IntentService {
                     //loadOffline();
                 }
             } catch (Exception ex) {
-                GetUserFollowersResponse res = new GetUserFollowersResponse();
-                sendBackBroadCast(res);
+                sendBackBroadCast(null);
 
 
             }
         }
     }
 
-    private void sendBackBroadCast(GetUserFollowersResponse res) {
+    private void sendBackBroadCast(String body) {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(FragmentFollowerInformation.FollowerInfoBroadcastReceiver.PROCESS_USER_INFO_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
         Bundle bundle = new Bundle();
-        bundle.putParcelable(Constants.RESULT_EXTRA, res);
+        bundle.putString(Constants.RESULT_EXTRA, body);
         broadcastIntent.putExtras(bundle);
         sendBroadcast(broadcastIntent);
     }

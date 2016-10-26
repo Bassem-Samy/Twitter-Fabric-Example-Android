@@ -3,8 +3,8 @@
     package="twittertest.bassem.com.twittertest">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
         android:name=".MyApplication"
@@ -27,6 +27,10 @@
         <service
             android:name=".Services.UserFollowersService"
             android:exported="false" />
+        <service
+            android:name=".Services.UserTimelineService"
+            android:exported="false" />
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="88bdd1e100bc4fe061e49bcf2859aa42ab025bb6" />

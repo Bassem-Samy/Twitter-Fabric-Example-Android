@@ -8,4 +8,5 @@
     <dimen name="padding15">15dp</dimen>
     <dimen name="follower_item_img_width">70dp</dimen>
     <dimen name="follower_item_img_height">70dp</dimen>
+    <dimen name="max_height_header">150dp</dimen>
 </resources>
