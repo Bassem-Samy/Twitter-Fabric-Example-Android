@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -45,7 +46,6 @@ public class FragmentUserFollowers extends Fragment {
     RecyclerView followersRecyclerView;
     SwipeRefreshLayout swipeContainer;
     ProgressBar scrollingProgressBar;
-    ProgressBar mainProgressBar;
     int visibleItemCount;
     int totalItemCount;
     int pastVisiblesItems;
@@ -63,16 +63,15 @@ public class FragmentUserFollowers extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_user_followers, container, false);
-        mainProgressBar = (ProgressBar) view.findViewById(R.id.prgrs_main);
         scrollingProgressBar = (ProgressBar) view.findViewById(R.id.prgrs_scrolling);
         swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
         followersRecyclerView = (RecyclerView) view.findViewById(R.id.rclr_followers);
         followersRecyclerView.setHasFixedSize(false);
         swipeContainer.setOnRefreshListener(swipeContainerOnRefreshListener);
-        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
+        swipeContainer.setColorSchemeResources(R.color.ColorBlue,
+                R.color.ColorGreen,
+                R.color.ColorRed,
+                R.color.ColorYellow);
         return view;
     }
 
@@ -114,7 +113,7 @@ public class FragmentUserFollowers extends Fragment {
         if (userFollowersResponse != null)
             followersIntent.putExtra(Constants.CURSOR_EXTRA, userFollowersResponse.getNext_cursor());
         else {
-            mainProgressBar.setVisibility(View.VISIBLE);
+            swipeContainer.setRefreshing(true);
             followersIntent.putExtra(Constants.CURSOR_EXTRA, "-1");
         }
         getContext().startService(followersIntent);
@@ -142,6 +141,9 @@ public class FragmentUserFollowers extends Fragment {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        visibleItemCount=0;
+        totalItemCount=0;
+        pastVisiblesItems=0;
         getFollowers();
     }
 
@@ -172,43 +174,6 @@ public class FragmentUserFollowers extends Fragment {
 
     };
 
-//    @Override
-//    public void onReceiveResult(int resultCode, Bundle resultData) {
-//        if (resultCode == Constants.STATUS_FINISHED) {
-//            Log.e("onReceiveResult", "true");
-//            if (mainProgressBar.getVisibility() == View.VISIBLE)
-//                mainProgressBar.setVisibility(View.GONE);
-//            userFollowersResponse = resultData.getParcelable(Constants.RESULT_EXTRA);
-//            if (userFollowersResponse != null && userFollowersResponse.getFollowers() != null) {
-//                for (int i = 0; i < userFollowersResponse.getFollowers().size(); i++) {
-//                    //replace if exists
-//                    mFollowers.add(userFollowersResponse.getFollowers().get(i));
-//                }
-//            }
-//if(getActivity()!=null)
-//            getActivity().runOnUiThread(new Runnable() {
-//                public void run() {
-//                    Log.d("UI thread", "I am the UI thread");
-//
-//                    mAdapter.notifyDataSetChanged();
-//
-//                }
-//            });
-//            infiniteScrollingLoading = false;
-//            scrollingProgressBar.setVisibility(View.GONE);
-//        } else {
-//            if (resultCode == Constants.STATUS_ERROR) {
-//                String errorMsg = resultData.getString(Constants.ERROR_MSG);
-//                if (errorMsg != null)
-//                    Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
-//                else
-//                    Toast.makeText(getContext(), R.string.error_msg, Toast.LENGTH_SHORT).show();
-//                scrollingProgressBar.setVisibility(View.GONE);
-//                mainProgressBar.setVisibility(View.GONE);
-//            }
-//        }
-//    }
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -222,12 +187,13 @@ public class FragmentUserFollowers extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
+        if (mReceiver != null)
+            getContext().unregisterReceiver(mReceiver);
     }
 
     @Override
     public void onDestroy() {
-        if (mReceiver != null)
-            getContext().unregisterReceiver(mReceiver);
+
         super.onDestroy();
     }
 
@@ -238,11 +204,11 @@ public class FragmentUserFollowers extends Fragment {
         super.onResume();
 
         if (mFollowers == null) {
-            mainProgressBar.setVisibility(View.VISIBLE);
+            swipeContainer.setRefreshing(true);
             getFollowers();
         } else {
             if (mFollowers.size() == 0) {
-                mainProgressBar.setVisibility(View.VISIBLE);
+                swipeContainer.setRefreshing(true);
                 getFollowers();
             }
         }
@@ -282,7 +248,7 @@ public class FragmentUserFollowers extends Fragment {
             } else {
                 Toast.makeText(getContext(), R.string.error_msg, Toast.LENGTH_SHORT).show();
                 scrollingProgressBar.setVisibility(View.GONE);
-                mainProgressBar.setVisibility(View.GONE);
+                swipeContainer.setRefreshing(false);
                 infiniteScrollingLoading = false;
 
             }
@@ -300,8 +266,10 @@ public class FragmentUserFollowers extends Fragment {
             mAdapter.notifyDataSetChanged();
             if (pastVisiblesItems != 0)
                 linearLayoutManager.scrollToPosition(pastVisiblesItems + 1);
+            else
+                linearLayoutManager.scrollToPosition(0);
             // followersRecyclerView.setVisibility(View.VISIBLE);
-            mainProgressBar.setVisibility(View.GONE);
+            swipeContainer.setRefreshing(false);
             infiniteScrollingLoading = false;
             scrollingProgressBar.setVisibility(View.GONE);
         }

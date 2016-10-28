@@ -7,4 +7,8 @@
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorSkyBlue">#55acee</color>
     <color name="ColorDefaultBG">#00A3E8</color>
+    <color name="ColorBlue">#51BEE8</color>
+    <color name="ColorGreen">#1EB36B</color>
+    <color name="ColorRed">#E6402B</color>
+    <color name="ColorYellow">#F9BB2B</color>
 </resources>
