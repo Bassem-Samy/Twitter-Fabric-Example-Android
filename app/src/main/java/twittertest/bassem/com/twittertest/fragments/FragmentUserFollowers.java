@@ -113,7 +113,7 @@ public class FragmentUserFollowers extends Fragment {
         if (userFollowersResponse != null)
             followersIntent.putExtra(Constants.CURSOR_EXTRA, userFollowersResponse.getNext_cursor());
         else {
-            swipeContainer.setRefreshing(true);
+            showSwipeRefreshLoading();
             followersIntent.putExtra(Constants.CURSOR_EXTRA, "-1");
         }
         getContext().startService(followersIntent);
@@ -141,9 +141,9 @@ public class FragmentUserFollowers extends Fragment {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        visibleItemCount=0;
-        totalItemCount=0;
-        pastVisiblesItems=0;
+        visibleItemCount = 0;
+        totalItemCount = 0;
+        pastVisiblesItems = 0;
         getFollowers();
     }
 
@@ -204,11 +204,11 @@ public class FragmentUserFollowers extends Fragment {
         super.onResume();
 
         if (mFollowers == null) {
-            swipeContainer.setRefreshing(true);
+            showSwipeRefreshLoading();
             getFollowers();
         } else {
             if (mFollowers.size() == 0) {
-                swipeContainer.setRefreshing(true);
+                showSwipeRefreshLoading();
                 getFollowers();
             }
         }
@@ -287,6 +287,15 @@ public class FragmentUserFollowers extends Fragment {
             Follower follower = mAdapter.getItemByPosition(followersRecyclerView.getChildLayoutPosition(v));
             startUserInformation(follower);
         }
+    }
+
+    void showSwipeRefreshLoading() {
+        swipeContainer.post(new Runnable() {
+            @Override
+            public void run() {
+                swipeContainer.setRefreshing(true);
+            }
+        });
     }
 
     private void startUserInformation(Follower follower) {
