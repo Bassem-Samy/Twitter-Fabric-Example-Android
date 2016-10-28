@@ -5,9 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -19,8 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
-import com.j256.ormlite.table.TableUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -186,17 +182,21 @@ public class FragmentUserFollowers extends Fragment {
 
     @Override
     public void onStop() {
-        super.onStop();
-        if (mReceiver != null)
+        if (mReceiver != null) {
             getContext().unregisterReceiver(mReceiver);
+            mReceiver = null;
+        }
+        super.onStop();
     }
 
     @Override
     public void onDestroy() {
-
+        if (mReceiver != null) {
+            getContext().unregisterReceiver(mReceiver);
+            mReceiver = null;
+        }
         super.onDestroy();
     }
-
     @Override
     public void onResume() {
         // UserFollowersService.shouldContinue = true;
@@ -304,4 +304,5 @@ public class FragmentUserFollowers extends Fragment {
             activityMain.loadFollowerInformation(follower);
         }
     }
+
 }

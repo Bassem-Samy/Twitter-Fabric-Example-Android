@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TwitterTest</string>
+    <string name="app_name">Twitter Followers</string>
     <string name="login_failed_msg">Sorry, couldn\'t login, please try again later</string>
 
     <!-- TODO: Remove or change this placeholder text -->
@@ -10,4 +10,7 @@
         No internet connection, please connect to the internet and try again
     </string>
     <string name="sorry_there_are_no_tweets">Sorry there are no tweets!</string>
+    <string name="action_language">عربي</string>
+    <string name="action_signout">signout</string>
+    <string name="login_with_twitter">Login with twitter</string>
 </resources>

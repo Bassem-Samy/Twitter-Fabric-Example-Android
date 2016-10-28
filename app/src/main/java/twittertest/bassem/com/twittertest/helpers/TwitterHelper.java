@@ -1,6 +1,7 @@
 package twittertest.bassem.com.twittertest.helpers;
 
 import android.content.Context;
+import android.webkit.CookieSyncManager;
 
 import com.google.gson.JsonElement;
 import com.twitter.sdk.android.Twitter;
@@ -102,5 +103,11 @@ public class TwitterHelper {
                 return currentSession.getUserId();
         }
         return -1;
+    }
+
+    public static void SignoutUser() {
+
+        Twitter.getSessionManager().clearActiveSession();
+        Twitter.logOut();
     }
 }

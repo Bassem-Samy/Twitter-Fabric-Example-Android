@@ -24,6 +24,7 @@ public class ActivityLogin extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         twitterLoginButton = (TwitterLoginButton) findViewById(R.id.login_button);
         twitterLoginButton.setCallback(twitterLoginCallback);
+twitterLoginButton.setText(R.string.login_with_twitter);
         checkUserSession();
     }
 

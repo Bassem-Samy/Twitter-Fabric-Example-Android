@@ -20,5 +20,7 @@ public class Constants {
     public static final int STATUS_RUNNING = 0;
     public static final int STATUS_FINISHED = 1;
     public static final int STATUS_ERROR = 2;
+    public static String enLang = "en";
+    public static String arLang = "ar";
 
 }

@@ -1,22 +1,24 @@
 package twittertest.bassem.com.twittertest;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
 import android.os.PersistableBundle;
-import android.support.v4.app.FragmentManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.view.Menu;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
-import com.twitter.sdk.android.Twitter;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
-import com.twitter.sdk.android.core.models.Tweet;
+import java.sql.SQLException;
 
-import io.fabric.sdk.android.Fabric;
 import twittertest.bassem.com.twittertest.Models.Follower;
 import twittertest.bassem.com.twittertest.fragments.FragmentFollowerInformation;
 import twittertest.bassem.com.twittertest.fragments.FragmentUserFollowers;
 import twittertest.bassem.com.twittertest.helpers.Constants;
+import twittertest.bassem.com.twittertest.helpers.DatabaseHelper;
 import twittertest.bassem.com.twittertest.helpers.TwitterHelper;
 
 
@@ -37,7 +39,10 @@ public class ActivityMain extends AppCompatActivity {
         if (savedInstanceState != null)
             currentFragmentTag = savedInstanceState.getString(CURRENT_FRAGMENT_EXTRA, null);
         initializeFragments();
+        prepareFloatingMenu();
+
     }
+
 
     private void initializeFragments() {
         if (currentFragmentTag != null && currentFragmentTag.equalsIgnoreCase(Constants.FRAGMENT_FOLLOWERINFORMATION_TAG))
@@ -75,4 +80,32 @@ public class ActivityMain extends AppCompatActivity {
         super.onSaveInstanceState(outState, outPersistentState);
     }
 
+    private void prepareFloatingMenu() {
+        com.getbase.floatingactionbutton.FloatingActionButton languageButton = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.menu_language);
+        languageButton.setOnClickListener(languageChangeOnClickListener);
+        com.getbase.floatingactionbutton.FloatingActionButton signoutButton = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.menu_signout);
+
+        signoutButton.setOnClickListener(signoutOnClickListener);
+    }
+
+    View.OnClickListener languageChangeOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            MyApplication.ChangeLanguage(ActivityMain.this);
+        }
+    };
+    View.OnClickListener signoutOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            TwitterHelper.SignoutUser();
+            try {
+                new DatabaseHelper(ActivityMain.this).clearFollowerTable();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            Intent loginIntent = new Intent(ActivityMain.this, ActivityLogin.class);
+            startActivity(loginIntent);
+            finish();
+        }
+    };
 }

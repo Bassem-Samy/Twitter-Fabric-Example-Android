@@ -8,29 +8,26 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.ListFragment;
+import android.support.v4.widget.NestedScrollView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.tweetui.TweetView;
 
-import it.carlom.stikkyheader.core.StikkyHeaderBuilder;
 import twittertest.bassem.com.twittertest.Models.Follower;
 import twittertest.bassem.com.twittertest.R;
 import twittertest.bassem.com.twittertest.Services.UserTimelineService;
 import twittertest.bassem.com.twittertest.helpers.Constants;
 import twittertest.bassem.com.twittertest.helpers.GsonHelper;
-import twittertest.bassem.com.twittertest.helpers.IconAnimator;
 import twittertest.bassem.com.twittertest.helpers.MyUtilities;
-import twittertest.bassem.com.twittertest.helpers.TwitterHelper;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -40,19 +37,21 @@ public class FragmentFollowerInformation extends Fragment {
     FollowerInfoBroadcastReceiver mReceiver;
     Tweet[] tweets;
     final int PAGESIZE = 10;
-    ScrollView mScrollView;
+    NestedScrollView mScrollView;
     LinearLayout tweetsLinearLayout;
-    LinearLayout containerLinearLayout;
     ImageView backgroundImageView;
+    Toolbar mToolbar;
+    ProgressBar mProgressBar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_follower_information, container, false);
         backgroundImageView = (ImageView) view.findViewById(R.id.img_follower_bg);
-        mScrollView = (ScrollView) view.findViewById(R.id.scrl_main);
+        mScrollView = (NestedScrollView) view.findViewById(R.id.scrl_main);
         tweetsLinearLayout = (LinearLayout) view.findViewById(R.id.lnr_tweets);
-        containerLinearLayout = (LinearLayout) view.findViewById(R.id.lnr_user_tweets_fragment);
+        mToolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        mProgressBar = (ProgressBar) view.findViewById(R.id.prgrs_tweets);
         return view;
     }
 
@@ -69,10 +68,15 @@ public class FragmentFollowerInformation extends Fragment {
         populateFollowerLayout();
     }
 
+
     private void populateFollowerLayout() {
         if (mFollower != null) {
-            if (mFollower.getBannerBackgroundUrl() != null && mFollower.getBannerBackgroundUrl().isEmpty() == false)
+            mToolbar.setTitle(mFollower.getName());
+            if (mFollower.getBannerBackgroundUrl() != null && mFollower.getBannerBackgroundUrl().isEmpty() == false) {
                 Glide.with(getContext()).load(mFollower.getBannerBackgroundUrl()).into(backgroundImageView);
+            } else {
+                backgroundImageView.setImageResource(R.drawable.default_img);
+            }
             if (MyUtilities.checkForInternet(getContext())) {
                 getTimeLine();
             } else {
@@ -92,11 +96,6 @@ public class FragmentFollowerInformation extends Fragment {
     }
 
     private void populateTweets() {
-        StikkyHeaderBuilder.stickTo(mScrollView)
-                .setHeader(R.id.header, containerLinearLayout)
-                .minHeightHeader(100)
-                .animator(new IconAnimator())
-                .build();
         mScrollView.setPadding(0, 0, 0, 0);
         for (int i = 0; i < tweets.length; i++) {
             tweetsLinearLayout.addView(
@@ -106,6 +105,8 @@ public class FragmentFollowerInformation extends Fragment {
         if (tweets.length == 0) {
             Toast.makeText(getContext(), R.string.sorry_there_are_no_tweets, Toast.LENGTH_SHORT).show();
         }
+        mProgressBar.setVisibility(View.GONE);
+
     }
 
     public class FollowerInfoBroadcastReceiver extends BroadcastReceiver {
@@ -125,9 +126,20 @@ public class FragmentFollowerInformation extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        if (mReceiver != null)
+    public void onStop() {
+        if (mReceiver != null) {
             getContext().unregisterReceiver(mReceiver);
+            mReceiver = null;
+        }
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mReceiver != null) {
+            getContext().unregisterReceiver(mReceiver);
+            mReceiver = null;
+        }
         super.onDestroy();
     }
 }

@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Twitter Followers</string>
+    <string name="login_failed_msg">عفوا لم نستطع الدخول حاول مرة اخرى</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="error_msg">عفواً لقد حدث خطأ من فضلك حاول لاحقاً</string>
+    <string name="no_internet_connection_getting_offlineData">لا يوجد اتصال بالانترنت</string>
+    <string name="no_internet_connection_please_connect_to_the_internet_and_try_again">
+لا يوجد اتصال بالأنترنت من فضلك عاود الاتصال وحاول مرة اخرى    </string>
+    <string name="sorry_there_are_no_tweets">عفواً لا يوجد تغريدات</string>
+    <string name="action_language">English</string>
+    <string name="action_signout">تسجيل الخروج</string>
+    <string name="login_with_twitter">الدخول بتويتر</string>
+
+</resources>
