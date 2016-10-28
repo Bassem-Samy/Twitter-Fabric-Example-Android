@@ -54,7 +54,7 @@ public class FragmentUserFollowers extends Fragment {
     final static int PAGESIZE = 45;
     Intent followersIntent;
     private onFollowersItemClickListener onFollowersItemClickListener = new onFollowersItemClickListener();
-
+    IntentFilter mFilter;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -78,10 +78,9 @@ public class FragmentUserFollowers extends Fragment {
             mFollowers = new ArrayList<Follower>();
         if (MyUtilities.checkForInternet(getContext()) == false)
             showOfflineToast();
-        mReceiver = new GetUserFollowersReceiver();
-        IntentFilter filter = new IntentFilter(GetUserFollowersReceiver.PROCESS_RESPONSE);
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        getContext().registerReceiver(mReceiver, filter);
+        mFilter  = new IntentFilter(GetUserFollowersReceiver.PROCESS_RESPONSE);
+        mFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver();
         Log.e("on created", "true");
 
         followersRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
@@ -96,6 +95,12 @@ public class FragmentUserFollowers extends Fragment {
         }
     }
 
+    void registerReceiver() {
+        if(mReceiver==null){
+            mReceiver = new GetUserFollowersReceiver();
+            getContext().registerReceiver(mReceiver, mFilter);
+        }
+    }
 
     public void getFollowers() {
 
@@ -197,15 +202,16 @@ public class FragmentUserFollowers extends Fragment {
         }
         super.onDestroy();
     }
+
     @Override
     public void onResume() {
         // UserFollowersService.shouldContinue = true;
 
         super.onResume();
-
+        registerReceiver();
         if (mFollowers == null) {
             showSwipeRefreshLoading();
-            getFollowers();
+                            getFollowers();
         } else {
             if (mFollowers.size() == 0) {
                 showSwipeRefreshLoading();
@@ -242,7 +248,7 @@ public class FragmentUserFollowers extends Fragment {
             swipeContainer.setRefreshing(false);
 
             GetUserFollowersResponse res = (GetUserFollowersResponse) intent.getExtras().getParcelable(Constants.RESULT_EXTRA);
-            if (res.getFollowers().size() > 0) {
+            if (res != null && res.getFollowers() != null && res.getFollowers().size() > 0) {
                 userFollowersResponse = (GetUserFollowersResponse) res;
                 updateLayout();
             } else {

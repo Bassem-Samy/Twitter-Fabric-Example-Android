@@ -30,7 +30,8 @@ public class GsonHelper {
             Gson gson
                     = new Gson();
             Tweet[] tweets = gson.fromJson(json, Tweet[].class);
-            return tweets;
+            if (tweets != null)
+                return tweets;
         } catch (Exception ex) {
             ex.printStackTrace();
         }

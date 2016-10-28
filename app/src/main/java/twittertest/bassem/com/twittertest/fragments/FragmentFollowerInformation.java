@@ -51,6 +51,7 @@ public class FragmentFollowerInformation extends Fragment {
         mScrollView = (NestedScrollView) view.findViewById(R.id.scrl_main);
         tweetsLinearLayout = (LinearLayout) view.findViewById(R.id.lnr_tweets);
         mToolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        
         mProgressBar = (ProgressBar) view.findViewById(R.id.prgrs_tweets);
         return view;
     }

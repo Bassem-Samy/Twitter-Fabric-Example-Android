@@ -84,7 +84,6 @@ public class ActivityMain extends AppCompatActivity {
         com.getbase.floatingactionbutton.FloatingActionButton languageButton = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.menu_language);
         languageButton.setOnClickListener(languageChangeOnClickListener);
         com.getbase.floatingactionbutton.FloatingActionButton signoutButton = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.menu_signout);
-
         signoutButton.setOnClickListener(signoutOnClickListener);
     }
 
