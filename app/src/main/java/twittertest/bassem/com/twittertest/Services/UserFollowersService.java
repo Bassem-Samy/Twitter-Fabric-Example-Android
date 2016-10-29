@@ -3,7 +3,6 @@ package twittertest.bassem.com.twittertest.Services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.os.ResultReceiver;
 import android.util.Log;
 
 import com.google.gson.JsonElement;
@@ -28,7 +27,6 @@ import twittertest.bassem.com.twittertest.helpers.TwitterHelper;
 
 public class UserFollowersService extends IntentService {
 
-    private static final String TAG = "UserFollowersService";
     private long userId;
     private String cursor;
     private int pageSize;
@@ -47,7 +45,6 @@ public class UserFollowersService extends IntentService {
             cursor = intent.getStringExtra(Constants.CURSOR_EXTRA);
             pageSize = intent.getIntExtra(Constants.PAGESIZE_EXTRA, 0);
             totalItemsSize = intent.getIntExtra(Constants.CURRENTUSERSCOUNT_EXTRA, 0);
-            Bundle bundle = new Bundle();
             try {
                 if (MyUtilities.checkForInternet(this)) {
                     retrofit2.Response<JsonElement> res = TwitterHelper.GetFollowers(userId, pageSize, cursor);
@@ -56,8 +53,6 @@ public class UserFollowersService extends IntentService {
                         updateDatabase(response);
 
                     } else {
-                        //Try parse error and put in bundle
-
                         sendBackBroadCast(null);
 
                     }
@@ -70,7 +65,6 @@ public class UserFollowersService extends IntentService {
 
 
             }
-            // this.stopSelf();
         }
     }
 

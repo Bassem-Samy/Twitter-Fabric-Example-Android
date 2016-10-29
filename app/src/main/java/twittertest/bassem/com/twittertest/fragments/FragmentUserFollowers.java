@@ -55,6 +55,7 @@ public class FragmentUserFollowers extends Fragment {
     Intent followersIntent;
     private onFollowersItemClickListener onFollowersItemClickListener = new onFollowersItemClickListener();
     IntentFilter mFilter;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -78,7 +79,7 @@ public class FragmentUserFollowers extends Fragment {
             mFollowers = new ArrayList<Follower>();
         if (MyUtilities.checkForInternet(getContext()) == false)
             showOfflineToast();
-        mFilter  = new IntentFilter(GetUserFollowersReceiver.PROCESS_RESPONSE);
+        mFilter = new IntentFilter(GetUserFollowersReceiver.PROCESS_RESPONSE);
         mFilter.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver();
         Log.e("on created", "true");
@@ -96,7 +97,7 @@ public class FragmentUserFollowers extends Fragment {
     }
 
     void registerReceiver() {
-        if(mReceiver==null){
+        if (mReceiver == null) {
             mReceiver = new GetUserFollowersReceiver();
             getContext().registerReceiver(mReceiver, mFilter);
         }
@@ -205,13 +206,11 @@ public class FragmentUserFollowers extends Fragment {
 
     @Override
     public void onResume() {
-        // UserFollowersService.shouldContinue = true;
-
         super.onResume();
         registerReceiver();
         if (mFollowers == null) {
             showSwipeRefreshLoading();
-                            getFollowers();
+            getFollowers();
         } else {
             if (mFollowers.size() == 0) {
                 showSwipeRefreshLoading();
@@ -264,7 +263,6 @@ public class FragmentUserFollowers extends Fragment {
     void updateLayout() {
         if (userFollowersResponse != null && userFollowersResponse.getFollowers() != null) {
             for (int i = 0; i < userFollowersResponse.getFollowers().size(); i++) {
-                //replace if exists
                 mFollowers.add(userFollowersResponse.getFollowers().get(i));
             }
             mAdapter = new UserFollowersAdapter(mFollowers, getContext(), onFollowersItemClickListener);
@@ -274,7 +272,6 @@ public class FragmentUserFollowers extends Fragment {
                 linearLayoutManager.scrollToPosition(pastVisiblesItems + 1);
             else
                 linearLayoutManager.scrollToPosition(0);
-            // followersRecyclerView.setVisibility(View.VISIBLE);
             swipeContainer.setRefreshing(false);
             infiniteScrollingLoading = false;
             scrollingProgressBar.setVisibility(View.GONE);

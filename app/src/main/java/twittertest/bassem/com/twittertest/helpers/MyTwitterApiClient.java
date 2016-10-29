@@ -1,7 +1,6 @@
 package twittertest.bassem.com.twittertest.helpers;
 
 import com.google.gson.JsonElement;
-import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterApiClient;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.models.User;
@@ -21,12 +20,6 @@ public class MyTwitterApiClient extends TwitterApiClient {
         super(session);
     }
 
-    /**
-     * Provide CustomService with defined endpoints
-     */
-    public TwitterUserProfileService getUserProfileService() {
-        return getService(TwitterUserProfileService.class);
-    }
 
     public TwitterUserFollowersService getUserFollowersService() {
         return getService(TwitterUserFollowersService.class);
@@ -37,11 +30,6 @@ public class MyTwitterApiClient extends TwitterApiClient {
     }
 }
 
-// example users/show service endpoint
-interface TwitterUserProfileService {
-    @GET("/1.1/users/show.json")
-    Call<User> show(@Query("user_id") long id);
-}
 
 interface TwitterUserFollowersService {
     @GET("/1.1/followers/list.json")

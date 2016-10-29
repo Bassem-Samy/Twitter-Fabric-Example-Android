@@ -37,16 +37,13 @@ public class UserTimelineService extends IntentService {
                     retrofit2.Response<JsonElement> res = TwitterHelper.GetUserTimeline(userId, pageSize);
                     if (res.isSuccessful()) {
                         sendBackBroadCast(res.body().toString());
-                        //updateDatabase(response);
 
                     } else {
-                        //Try parse error and put in bundle
 
                         sendBackBroadCast(null);
 
                     }
                 } else {
-                    //loadOffline();
                 }
             } catch (Exception ex) {
                 sendBackBroadCast(null);

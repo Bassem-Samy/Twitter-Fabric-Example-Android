@@ -90,12 +90,14 @@ public class Follower implements Parcelable {
     public void setBannerBackgroundUrl(String bannerBackgroundUrl) {
         this.bannerBackgroundUrl = bannerBackgroundUrl;
     }
-    public String getFinalProfileImageUrl(){
-        if(profileImageUrl!=null&&profileImageUrl.isEmpty()==false){
-            return profileImageUrl.replace("normal","bigger");
+
+    public String getFinalProfileImageUrl() {
+        if (profileImageUrl != null && profileImageUrl.isEmpty() == false) {
+            return profileImageUrl.replace("normal", "bigger");
         }
         return profileImageUrl;
     }
+
     @Override
     public int describeContents() {
         return 0;

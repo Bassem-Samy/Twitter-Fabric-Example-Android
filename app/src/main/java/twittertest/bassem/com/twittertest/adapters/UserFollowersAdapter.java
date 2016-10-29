@@ -11,8 +11,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 
 import twittertest.bassem.com.twittertest.Models.Follower;
@@ -43,8 +41,6 @@ public class UserFollowersAdapter extends RecyclerView.Adapter<UserFollowersAdap
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-
-//holder
         holder.nameTextView.setText(mDataset.get(position).getName());
         holder.handleTextView.setText(mDataset.get(position).getScreenName());
         holder.bioTextView.setText(mDataset.get(position).getBio());

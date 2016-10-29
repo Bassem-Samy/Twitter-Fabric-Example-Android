@@ -12,14 +12,9 @@ public class Constants {
     public static final String CURSOR_EXTRA = "cursor";
     public static final String PAGESIZE_EXTRA = "page_size";
     public static final String USER_ID_EXTRA = "user_id";
-    public static final String RECEIVER_EXTRA="receiver";
-    public static final String CURRENTUSERSCOUNT_EXTRA="current_users_count";
+    public static final String CURRENTUSERSCOUNT_EXTRA = "current_users_count";
     public static final String FOLLOWER_EXTRA = "follower";
     public static final String RESULT_EXTRA = "result";
-    public static final String ERROR_MSG ="error_msg" ;
-    public static final int STATUS_RUNNING = 0;
-    public static final int STATUS_FINISHED = 1;
-    public static final int STATUS_ERROR = 2;
     public static String enLang = "en";
     public static String arLang = "ar";
 

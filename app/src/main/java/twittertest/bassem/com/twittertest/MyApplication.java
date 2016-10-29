@@ -32,14 +32,13 @@ public class MyApplication extends Application {
         TwitterHelper.initializeTwitter(this);
         LocaleHelper localeHelper = new LocaleHelper();
         selectedLang = localeHelper.GetLanguage(this);
-        Log.e("selectedlang",selectedLang);
         updateLang(selectedLang);
     }
 
     private void updateLang(String lang) {
         LocaleHelper localeHelper = new LocaleHelper();
         selectedLang = lang;
-        if (selectedLang == null || selectedLang.equals("")) {
+        if (selectedLang == null || selectedLang.isEmpty()) {
             localeHelper.SetLocale(this, Constants.enLang);
         } else {
             localeHelper.SetLocale(this, selectedLang);
@@ -48,16 +47,16 @@ public class MyApplication extends Application {
     }
 
     public static void ChangeLanguage(Context context) {
-        String language = "en";
+        String language = Constants.enLang;
 
         LocaleHelper helper = new LocaleHelper();
         if (helper.GetLanguage(context).equalsIgnoreCase(language)) {
-            language = "ar";
+            language = Constants.arLang;
         }
         helper.SetLocale(context, language);
         Intent loginIntent = new Intent(context, ActivityLogin.class);
         context.startActivity(loginIntent);
-        ((AppCompatActivity)context).finish();
+        ((AppCompatActivity) context).finish();
 
     }
 

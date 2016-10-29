@@ -90,10 +90,7 @@ public class FragmentFollowerInformation extends Fragment {
         Intent timeLineIntent = new Intent(Intent.ACTION_SYNC, null, getActivity(), UserTimelineService.class);
         timeLineIntent.putExtra(Constants.USER_ID_EXTRA, Long.parseLong(mFollower.getId()));
         timeLineIntent.putExtra(Constants.PAGESIZE_EXTRA, PAGESIZE);
-
         getContext().startService(timeLineIntent);
-
-
     }
 
     private void populateTweets() {

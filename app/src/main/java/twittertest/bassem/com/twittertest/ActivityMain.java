@@ -1,13 +1,10 @@
 package twittertest.bassem.com.twittertest;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
@@ -28,7 +25,6 @@ public class ActivityMain extends AppCompatActivity {
     final String CURRENT_FRAGMENT_EXTRA = "current_fragment";
     FrameLayout containerFrameLayout;
     FragmentUserFollowers fragmentUserFollowers;
-    ProgressBar mainProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
